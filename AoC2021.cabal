@@ -18,11 +18,18 @@ executable Day1
   other-modules:       Harness
   main-is:             Day1/Main.hs
   default-language:    Haskell2010
-  build-depends:       base >= 4.7 && < 5, lens
+  build-depends:       base >= 4.7 && < 5, lens, parsec
 
 executable Day2
   hs-source-dirs:      src
   other-modules:       Harness
   main-is:             Day2/Main.hs
   default-language:    Haskell2010
-  build-depends:       base >= 4.7 && < 5, lens
+  build-depends:       base >= 4.7 && < 5, lens, parsec
+
+executable Day3
+  hs-source-dirs:      src
+  other-modules:       Harness
+  main-is:             Day3/Main.hs
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5, lens, parsec
