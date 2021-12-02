@@ -1,7 +1,11 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Main where
 
+import Control.Lens
+import Control.Monad
 import Harness
 import Text.Parsec
 import Text.Parsec.String
@@ -17,27 +21,32 @@ parser =
     <|> (string "up " >> (Up . read <$> many1 digit))
     <|> (string "down " >> (Down . read <$> many1 digit))
 
-p1 :: [Move] -> Int
-p1 =
-  uncurry (*)
-    . foldr
-      ( \m (x, d) -> case m of
-          Forward y -> (x + y, d)
-          Up y -> (x, d - y)
-          Down y -> (x, d + y)
+exec :: (Int -> a -> a) -> (Int -> a -> a) -> (Int -> a -> a) -> (a -> b) -> a -> [Move] -> b
+exec f g h c x =
+  c
+    . foldl
+      ( \a m -> case m of
+          Forward n -> f n a
+          Up n -> g n a
+          Down n -> h n a
       )
-      (0, 0)
+      x
+
+data State1 = State1 {state1X :: Int, state1D :: Int} deriving (Show)
+
+data State2 = State2 {state2X :: Int, state2D :: Int, state2A :: Int} deriving (Show)
+
+makeFields ''State1
+makeFields ''State2
+
+res :: (Num b, HasX a b, HasD a b) => a -> b
+res = liftM2 (*) (view x) (view d)
+
+p1 :: [Move] -> Int
+p1 = exec (x +~) (d -~) (d +~) res $ State1 0 0
 
 p2 :: [Move] -> Int
-p2 =
-  (\(a, b, _) -> a * b)
-    . foldl
-      ( \(x, d, a) m -> case m of
-          Forward y -> (x + y, d + y * a, a)
-          Up y -> (x, d, a - y)
-          Down y -> (x, d, a + y)
-      )
-      (0, 0, 0)
+p2 = exec (\n t -> t &~ (x += n >> d += (n * view a t))) (a -~) (a +~) res $ State2 0 0 0
 
 main :: IO ()
 main = runList 2 p2
