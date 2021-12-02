@@ -5,7 +5,6 @@
 module Main where
 
 import Control.Lens
-import Control.Monad
 import Harness
 import Text.Parsec
 import Text.Parsec.String
@@ -40,7 +39,7 @@ makeFields ''State1
 makeFields ''State2
 
 res :: (Num b, HasX a b, HasD a b) => a -> b
-res = liftM2 (*) (view x) (view d)
+res = (*) <$> view x <*> view d
 
 p1 :: [Move] -> Int
 p1 = exec (x +~) (d -~) (d +~) res $ State1 0 0
