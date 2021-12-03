@@ -1,37 +1,49 @@
 module Main where
 
+import Data.Char
 import Data.List
 import Harness
 
+digit :: Char -> Int
+digit x = ord x - ord '0'
+
+bdigit :: Char -> Bool
+bdigit x = x == '1'
+
+bval :: Bool -> Int
+bval True = 1
+bval _ = 0
+
+bnum :: [Bool] -> Int
+bnum = foldl (\x y -> x * 2 + bval y) 0
+
 p1 :: String -> Int
 p1 s =
-  let ss = transpose $ lines s
-      zs = map (length . filter (== '0')) ss
-      os = map (length . filter (== '1')) ss
-      gs = zipWith (\a b -> if a > b then 0 else 1) zs os
-      es = map (1 -) gs
-      gr = foldl (\a b -> a * 2 + b) 0 gs
-      er = foldl (\a b -> a * 2 + b) 0 es
-   in gr * er
+  let ss = transpose $ map (map bdigit) $ lines s
+      zs = map (length . filter not) ss
+      os = map (length . filter id) ss
+      gs = zipWith (<) zs os
+      es = map not gs
+   in bnum gs * bnum es
 
-lfilter :: [String] -> Bool -> Int -> Char -> String
+lfilter :: [[Bool]] -> Bool -> Int -> Bool -> [Bool]
 lfilter ss mc idx def =
   let bs = map (!! idx) ss
-      zs = length $ filter (== '0') bs
-      os = length $ filter (== '1') bs
+      zs = length $ filter not bs
+      os = length $ filter id bs
       ss'
         | zs == os = filter ((== def) . (!! idx)) ss
-        | (zs > os) == mc = filter ((== '0') . (!! idx)) ss
-        | otherwise = filter ((== '1') . (!! idx)) ss
+        | (zs > os) == mc = filter (not . (!! idx)) ss
+        | otherwise = filter (!! idx) ss
    in if length ss' == 1 then head ss' else lfilter ss' mc (idx + 1) def
 
 p2 :: String -> Int
 p2 s =
-  let ss = lines s
-      os = lfilter ss True 0 '1'
-      cs = lfilter ss False 0 '0'
-      or = foldl (\a b -> a * 2 + b) 0 $ map (\c -> if c == '0' then 0 else 1) os
-      cr = foldl (\a b -> a * 2 + b) 0 $ map (\c -> if c == '0' then 0 else 1) cs
+  let ss = map (map bdigit) $ lines s
+      os = lfilter ss True 0 True
+      cs = lfilter ss False 0 False
+      or = bnum os
+      cr = bnum cs
    in or * cr
 
 main :: IO ()
