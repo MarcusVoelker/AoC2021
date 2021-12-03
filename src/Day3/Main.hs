@@ -1,7 +1,6 @@
 module Main where
 
 import Control.Lens
-import Control.Monad
 import Data.Char
 import Data.List
 import Harness
@@ -30,7 +29,10 @@ p1 s =
 
 lfilter :: [[Int]] -> Int -> Int -> [Int]
 lfilter [x] _ _ = x
-lfilter ss idx def = lfilter (filter =<< (. ((def ==) . (!! idx))) . (/=) . liftM2 (>) length ((2 *) . sum . map (!! idx)) $ ss) (idx + 1) def
+lfilter ss idx def =
+  let bs = map (!! idx) ss
+      ss' = filter ((/= (length bs > 2 * sum bs)) . (== def) . (!! idx)) ss
+   in lfilter ss' (idx + 1) def
 
 p2 :: String -> Int
 p2 s =
