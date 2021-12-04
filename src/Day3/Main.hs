@@ -1,4 +1,4 @@
-module Main where
+module Day3.Main where
 
 import Control.Lens
 import Data.Char
@@ -35,9 +35,7 @@ lfilter ss idx def =
    in lfilter ss' (idx + 1) def
 
 p2 :: String -> Int
-p2 s =
-  let ss = map (map digit) $ lines s
-   in (0, 1) & both %~ (num . lfilter ss 0) & uncurry (*)
+p2 s = (0, 1) & both %~ (num . lfilter (map (map digit) $ lines s) 0) & uncurry (*)
 
-main :: IO ()
-main = run 3 p2
+main :: Bool -> IO ()
+main b = run 3 b p1 p2

@@ -1,4 +1,4 @@
-module Main where
+module Day1.Main where
 
 import Harness
 
@@ -14,8 +14,5 @@ p2 xs = p1 $ zipWith3 (\a b c -> a + b + c) xs (tail xs) (tail (tail xs))
 g2 :: [Int] -> Int
 g2 xs = p1 $ zipWith3 (\a b c -> a + b + c) xs (tail xs) (tail (tail xs))
 
-main :: IO ()
-main = runList 1 p1
-
-gmain :: IO ()
-gmain = runList 1 g1
+main :: Bool -> IO ()
+main b = runList 1 b p1 p2

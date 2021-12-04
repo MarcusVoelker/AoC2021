@@ -1,7 +1,7 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Main where
+module Day2.Main where
 
 import Control.Lens
 import Harness
@@ -46,5 +46,5 @@ p1 = exec (x +~) (d -~) (d +~) res $ State1 0 0
 p2 :: [Move] -> Int
 p2 = exec (\n t -> t &~ (x += n >> d += (n * view a t))) (a -~) (a +~) res $ State2 0 0 0
 
-main :: IO ()
-main = runList 2 p2
+main :: Bool -> IO ()
+main b = runList 2 b p1 p2
