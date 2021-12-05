@@ -18,4 +18,5 @@ executable AoC
   other-modules:       Harness, Day1.Main, Day2.Main, Day3.Main, Day4.Main, Day5.Main
   main-is:             Main.hs
   default-language:    Haskell2010
-  build-depends:       base >= 4.7 && < 5, lens, parsec
+  build-depends:       base >= 4.7 && < 5, lens, parsec, containers
+  default-extensions:  TupleSections, TemplateHaskell, FunctionalDependencies
