@@ -1,9 +1,10 @@
 module Day8.Main where
 
+import Control.Monad.Trans.State
 import Data.List
 import qualified Data.Map as M
 import Harness
-import Text.Parsec hiding (Line)
+import Text.Parsec hiding (Line, State)
 import Text.Parsec.String
 
 data Display = Display {codes :: [String], value :: [String]}
@@ -20,32 +21,37 @@ instance Read Display where
   readsPrec = parsecToReadsPrec parser
 
 p1 :: [Display] -> Int
-p1 ds = sum $ map (\d -> length $ filter (\e -> length e < 5 || length e > 6) $ value d) ds
+p1 ds = sum $ map (length . filter (\e -> length e < 5 || length e > 6) . value) ds
 
-concatD :: [Int] -> Int
-concatD [x, y, z, w] = 1000 * x + 100 * y + 10 * z + w
+getCond :: Int -> (String -> Bool) -> State [String] String
+getCond l f = do
+  ls <- get
+  let res = head $ filter (\c -> length c == l && f c) ls
+  let rest = ls \\ [res]
+  put rest
+  return res
+
+mapBuilder :: State [String] (M.Map String Int)
+mapBuilder = do
+  cd1 <- getCond 2 (const True)
+  cd4 <- getCond 4 (const True)
+  cd7 <- getCond 3 (const True)
+  cd8 <- getCond 7 (const True)
+  cd9 <- getCond 6 (null . (cd4 \\))
+  cd0 <- getCond 6 (null . (cd1 \\))
+  cd6 <- getCond 6 (const True)
+  cd5 <- getCond 5 (\c -> null (c \\ cd9) && null (c \\ cd6))
+  cd3 <- getCond 5 (null . (\\ cd9))
+  cd2 <- getCond 5 (const True)
+  return $ M.fromList [(sort cd0, 0), (sort cd1, 1), (sort cd2, 2), (sort cd3, 3), (sort cd4, 4), (sort cd5, 5), (sort cd6, 6), (sort cd7, 7), (sort cd8, 8), (sort cd9, 9)]
+
+buildMap :: Display -> M.Map String Int
+buildMap d = evalState mapBuilder (codes d)
 
 decode :: Display -> Int
 decode d =
-  let cd1 = head $ filter ((== 2) . length) (codes d)
-      cd4 = head $ filter ((== 4) . length) (codes d)
-      cd7 = head $ filter ((== 3) . length) (codes d)
-      cd8 = head $ filter ((== 7) . length) (codes d)
-      sixes = filter ((== 6) . length) (codes d)
-      cd9 = head $ filter (\c -> null (cd4 \\ c)) sixes
-      cd0 = head $ filter (\c -> null (cd1 \\ c) && c /= cd9) sixes
-      cd6 = head $ filter (\c -> c /= cd9 && c /= cd0) sixes
-      fives = filter ((== 5) . length) (codes d)
-      cd5 = head $ filter (\c -> null (c \\ cd9) && null (c \\ cd6)) fives
-      cd3 = head $ filter (\c -> null (c \\ cd9) && c /= cd5) fives
-      cd2 = head $ filter (\c -> c /= cd3 && c /= cd5) fives
-      m = M.fromList [(sort cd0, 0), (sort cd1, 1), (sort cd2, 2), (sort cd3, 3), (sort cd4, 4), (sort cd5, 5), (sort cd6, 6), (sort cd7, 7), (sort cd8, 8), (sort cd9, 9)]
-   in foldl (\x y -> x * 10 + y) 0 $
-        map
-          ( \c ->
-              m M.! (sort c)
-          )
-          (value d)
+  let m = buildMap d
+   in foldl (\x y -> x * 10 + y) 0 $ map ((m M.!) . sort) (value d)
 
 p2 :: [Display] -> Int
 p2 ds = sum $ map decode ds
