@@ -49,7 +49,7 @@ lineScore :: State String Res
 lineScore = do
   code <- get
   case code of
-    [] -> put "" >> return (Incm 0)
+    [] -> return (Incm 0)
     [c] -> put "" >> return (if isOpen c then Incm (scoreIncm (pair c)) else Corr (scoreCorr c))
     (c : cs) -> do
       put cs
