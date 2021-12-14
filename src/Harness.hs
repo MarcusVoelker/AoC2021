@@ -8,6 +8,11 @@ run idx b p1 p2 = do
   f <- readFile $ "inputs/in" ++ show idx ++ ".txt"
   print ((if b then p2 else p1) f)
 
+runIO :: Int -> Bool -> (String -> IO ()) -> (String -> IO ()) -> IO ()
+runIO idx b p1 p2 = do
+  f <- readFile $ "inputs/in" ++ show idx ++ ".txt"
+  (if b then p2 else p1) f
+
 runList :: (Show a, Read b) => Int -> Bool -> ([b] -> a) -> ([b] -> a) -> IO ()
 runList idx b p1 p2 = run idx b (p1 . map read . lines) (p2 . map read . lines)
 

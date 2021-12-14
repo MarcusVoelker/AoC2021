@@ -4,6 +4,8 @@ import qualified Day1.Main as D1
 import qualified Day10.Main as D10
 import qualified Day11.Main as D11
 import qualified Day12.Main as D12
+import qualified Day13.Main as D13
+import qualified Day14.Main as D14
 import qualified Day2.Main as D2
 import qualified Day3.Main as D3
 import qualified Day4.Main as D4
@@ -14,7 +16,7 @@ import qualified Day8.Main as D8
 import qualified Day9.Main as D9
 
 ms :: [Bool -> IO ()]
-ms = [D1.main, D2.main, D3.main, D4.main, D5.main, D6.main, D7.Main, D8.Main, D9.Main, D10.Main, D11.Main, D12.Main]
+ms = [D1.main, D2.main, D3.main, D4.main, D5.main, D6.main, D7.main, D8.main, D9.main, D10.main, D11.main, D12.main, D13.main, D14.main]
 
 main :: IO ()
 main = do
