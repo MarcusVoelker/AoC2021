@@ -2,7 +2,7 @@ module Day5.Main where
 
 import Control.Monad
 import Data.List
-import qualified Data.Map as M
+import qualified Data.Map.Strict as M
 import Data.Ord
 import Harness
 import Text.Parsec hiding (Line)
@@ -36,13 +36,16 @@ mZip a b = zip a b
 
 traceLine :: Line -> M.Map (Int, Int) Int -> M.Map (Int, Int) Int
 traceLine (Line (startX, startY) (endX, endY)) m =
-  foldl (\m' (x, y) -> M.insertWith (+) (x, y) 1 m') m $ mZip (axis startX endX) (axis startY endY)
+  foldr (\p -> M.insertWith (+) p 1) m $ mZip (axis startX endX) (axis startY endY)
+
+perf :: [Line] -> Int
+perf = M.size . M.filter (> 1) . foldr traceLine M.empty
 
 p1 :: [Line] -> Int
-p1 s = M.size $ M.filter (> 1) $ foldr traceLine M.empty $ filter (\(Line (xs, ys) (xe, ye)) -> xs == xe || ys == ye) s
+p1 = perf . filter (\(Line (xs, ys) (xe, ye)) -> xs == xe || ys == ye)
 
 p2 :: [Line] -> Int
-p2 s = M.size $ M.filter (> 1) $ foldr traceLine M.empty s
+p2 = perf
 
 main :: Bool -> IO ()
 main b = runList 5 b p1 p2
