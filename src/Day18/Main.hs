@@ -7,8 +7,6 @@ import Text.Parsec.String
 
 data Snail = Leaf Int | Node Snail Snail deriving (Eq)
 
-data Edit = None | Some | Explode Int Int deriving (Eq)
-
 instance Show Snail where
   show (Leaf i) = show i
   show (Node l r) = "[" ++ show l ++ "," ++ show r ++ "]"
