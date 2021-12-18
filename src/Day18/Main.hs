@@ -3,7 +3,6 @@ module Day18.Main where
 import Data.Maybe
 import Harness
 import Text.Parsec hiding (Line, State)
-import Text.Parsec.Char
 import Text.Parsec.String
 
 data Snail = Leaf Int | Node Snail Snail deriving (Eq)
@@ -44,23 +43,6 @@ explodeR (Node l r) i = Node (explodeR l i) r
 explodeL :: Snail -> Int -> Snail
 explodeL (Leaf n) i = Leaf (n + i)
 explodeL (Node l r) i = Node l (explodeL r i)
-
-{- normStep :: (Int, Snail) -> (Snail, Edit)
-normStep (4, Node (Leaf l) (Leaf r)) = (Leaf 0, Explode l r)
-normStep (_, Leaf n)
-  | n > 9 = (Node (Leaf (div n 2)) (Leaf (div (n + 1) 2)), Some)
-  | otherwise = (Leaf n, None)
-normStep (n, Node l r) =
-  let (l', el) = normStep (n + 1, l)
-   in case el of
-        None ->
-          let (r', er) = normStep (n + 1, r)
-           in case er of
-                (Explode lv rv) -> (Node (explodeL l lv) r', Explode 0 rv)
-                _ -> (Node l' r', er)
-        Some -> (Node l' r, Some)
-        (Explode 0 0) -> (Node l' r, Some)
-        (Explode lv rv) -> (Node l' (explodeR r rv), Explode lv 0) -}
 
 normStep :: (Int, Snail) -> (Snail, Bool)
 normStep (i, n) =
