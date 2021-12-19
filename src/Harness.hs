@@ -24,3 +24,10 @@ parsecToReadsPrec parsecParser prec input =
   case parse (withRemaining parsecParser) "" input of
     Left _ -> []
     Right result -> [result]
+
+whileM :: (Monad m) => m Bool -> m a -> m [a]
+whileM b m = do
+  v <- b
+  if v
+    then m >>= (\x -> (x :) <$> whileM b m)
+    else return []

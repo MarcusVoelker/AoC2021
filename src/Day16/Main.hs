@@ -43,13 +43,6 @@ eval _ = -1
 readBinary :: String -> Integer
 readBinary = foldl (\a b -> a * 2 + fromIntegral (ord b - ord '0')) 0
 
-whileM :: (Monad m) => m Bool -> m a -> m [a]
-whileM b m = do
-  v <- b
-  if v
-    then m >>= (\x -> (x :) <$> whileM b m)
-    else return []
-
 literalParser :: Parser Package
 literalParser = do
   v <- readBinary <$> count 3 digit
