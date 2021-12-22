@@ -128,6 +128,16 @@ merge ss m seen cur
         rvals = concatMap (\(s, t) -> map (transform t) $ merge ss m (cur : seen) s) rsuccs
      in nub ((ss !! cur) ++ fvals ++ rvals)
 
+mergeScanners :: [((Int, Int), ((Int, Int, Int), Heading))] -> [Int] -> Int -> [(Int, Int, Int)]
+mergeScanners m seen cur
+  | cur `elem` seen = []
+  | otherwise =
+    let fsuccs = map (\((_, s), t) -> (s, t)) $ filter (\((i, _), _) -> i == cur) m
+        rsuccs = map (\((s, _), t) -> (s, t)) $ filter (\((_, i), _) -> i == cur) m
+        fvals = concatMap (\(s, t) -> map (itransform t) $ mergeScanners m (cur : seen) s) fsuccs
+        rvals = concatMap (\(s, t) -> map (transform t) $ mergeScanners m (cur : seen) s) rsuccs
+     in nub ((0, 0, 0) : fvals ++ rvals)
+
 reconstruct :: Int -> [[(Int, Int, Int)]] -> IO [(Int, Int, Int)]
 reconstruct n ss = do
   let zs = zip [0 ..] ss
@@ -135,14 +145,27 @@ reconstruct n ss = do
   print res
   return $ merge ss res [] 0
 
+reconstructScanners :: Int -> [[(Int, Int, Int)]] -> IO [(Int, Int, Int)]
+reconstructScanners n ss = do
+  let zs = zip [0 ..] ss
+  let res = catMaybes [((i, j),) <$> overlap n a b | (i, a) <- zs, (j, b) <- zs, i < j]
+  print res
+  return $ mergeScanners res [] 0
+
 p1 :: String -> IO ()
 p1 s = do
   res <- reconstruct 12 $ parse s
   print res
   print $ length res
 
+manhattan :: (Int, Int, Int) -> (Int, Int, Int) -> Int
+manhattan (ax, ay, az) (bx, by, bz) = abs (ax - bx) + abs (ay - by) + abs (az - bz)
+
 p2 :: String -> IO ()
-p2 s = putStrLn "Part 2"
+p2 s = do
+  res <- reconstructScanners 12 $ parse s
+  print res
+  print $ maximum [manhattan l r | l <- res, r <- res]
 
 main :: Bool -> IO ()
 main b = runIO 19 b p1 p2
